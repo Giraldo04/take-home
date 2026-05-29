@@ -11,11 +11,12 @@ export default defineConfig({
     host: true,
     port: Number(process.env.PORT) || 4321,
   },
-  // El preview de Astro (Vite) bloquea hosts desconocidos. Autorizamos los
-  // dominios de Railway para que el sitio sea accesible públicamente.
+  // El preview de Astro (Vite) bloquea hosts desconocidos. Desactivamos esa
+  // verificación para que el sitio sea accesible bajo cualquier dominio
+  // (Railway asigna un host dinámico). Aceptable para un sitio estático público.
   vite: {
     preview: {
-      allowedHosts: ['.railway.app'],
+      allowedHosts: true,
     },
   },
 });
