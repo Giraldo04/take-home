@@ -61,6 +61,10 @@ Sin configuración funciona con **datos de ejemplo** (`src/lib/sample-products.t
 npm run build    # genera dist/ (estático, desplegable en cualquier CDN)
 ```
 
+# URL deploy que hice en Railway
+
+https://take-home-production-7414.up.railway.app/
+
 ## Que haria con otra hora
 Implementaria mejor una experiencia de usuario y haria mas robusto el flujo, como agregar categorias y filtros simples en el menu, mejorar el manejo de errores y estados de carga, agregar confirmaciones visuales mas adecuadas para cada caso.
 
