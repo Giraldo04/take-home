@@ -60,3 +60,10 @@ Sin configuración funciona con **datos de ejemplo** (`src/lib/sample-products.t
 ```bash
 npm run build    # genera dist/ (estático, desplegable en cualquier CDN)
 ```
+
+## Que haria con otra hora
+Implementaria mejor una experiencia de usuario y haria mas robusto el flujo, como agregar categorias y filtros simples en el menu, mejorar el manejo de errores y estados de carga, agregar confirmaciones visuales mas adecuadas para cada caso.
+
+## Receta para una pizza colombiana basica ;)
+
+Tirar la masa en la bandeja preparada con un poco de hariana antes, salsa de tomate, jamon, queso, pina y pollo desmechado, despues al horno por unos 15 minutos y tamos listos

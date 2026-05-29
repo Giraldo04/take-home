@@ -32,7 +32,7 @@ que cosas no sobreingenierizar para este take home.
 
 quiero una solucion pragmatica y realista para una prueba tecnica rapida.
 
-Esta fue la respuesta:
+## Esta fue la respuesta:
 
 Aquí tienes una propuesta pragmática, pensada para una prueba técnica rápida donde lo que se evalúa es claridad, criterio y ejecución limpia —no complejidad.
 
@@ -154,12 +154,12 @@ Resumen del criterio: una página, tres capas delgadas, un store de carrito, un 
 ¿Quieres que lo deje montado? Puedo generar el scaffold completo (proyecto Astro + lib + componentes + Code.gs + README) listo para npm install y deploy.
 
 
- segundo prompt
+ ## segundo prompt
 
  "si, dejalo montado"
 
 
- tercer prompt:
+ ## tercer prompt:
 
  la estructura ya esta lista y funcionando, ahora quiero mejorar un poco la ui sin cambiar la arquitectura ni sobreingenierizar nada.
 
@@ -195,7 +195,7 @@ formulario checkout.
 tambien quiero que el menu se vea mas parecido a una experiencia moderna de pedidos de restaurante.
 
 
-cuarto prompt:
+## cuarto prompt:
 
 ahora quiero conectar el proyecto a google sheets real y validar el flujo completo end to end,
 ayudame paso a paso con:
@@ -216,7 +216,7 @@ quiero el flujo mas simple y rapido posible para dejarlo funcionando hoy.
 
 
 
-quinto prompt:
+## quinto prompt:
 
 ya configure google sheets y apps script.
 ahora ayudame a verificar que el flujo completo este funcionando correctamente.
@@ -233,7 +233,7 @@ quiero revisar:
 si hace falta ajustar algo pequeno en api.ts o code.gs hazlo de la forma mas simple posible.
 
 
-sexto prompt:
+## sexto prompt:
 
 el take-home pide guardar nombre y email del cliente, actualmente el formulario tiene nombre, telefono y notas.
 por favor ajusta lo minimo necesario para que el checkout tenga nombre y email como campos principales, y si quieres deja notas opcional.
@@ -241,7 +241,7 @@ actualiza tambien el payload, el code.gs si hace falta, los encabezados esperado
 no cambies la arquitectura ni agregues features nuevas
 
 
-septimo y ultimo prompt:
+## septimo y ultimo prompt:
 
 el flujo completo ya funciona localmente. ahora ayudame a preparar el deploy publico del proyecto.
 lo desplegare en railway
