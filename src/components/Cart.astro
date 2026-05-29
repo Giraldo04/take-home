@@ -1,0 +1,355 @@
+---
+// Drawer del carrito + lógica client-side (estado, render y checkout).
+---
+
+<button id="cart-toggle" class="cart-toggle" aria-label="Abrir carrito">
+  <span aria-hidden="true">🛒</span>
+  <span class="cart-toggle-label">Carrito</span>
+  <span id="cart-count" class="cart-count" hidden>0</span>
+</button>
+
+<div id="cart-overlay" class="overlay" hidden></div>
+
+<aside id="cart-drawer" class="drawer" aria-hidden="true">
+  <header class="drawer-head">
+    <h2>Tu pedido</h2>
+    <button id="cart-close" class="icon-btn" aria-label="Cerrar carrito">✕</button>
+  </header>
+
+  <div class="drawer-body">
+    <div id="cart-items" class="cart-list"></div>
+    <p id="cart-empty" class="cart-empty-msg">Tu carrito está vacío.</p>
+  </div>
+
+  <form id="checkout-form" class="checkout" hidden>
+    <div class="row total-row">
+      <span>Total</span>
+      <strong id="cart-total">$0.00</strong>
+    </div>
+    <input id="cust-name" name="name" type="text" placeholder="Tu nombre" required />
+    <input id="cust-email" name="email" type="email" placeholder="Email" required />
+    <textarea id="cust-notes" name="notes" placeholder="Notas (opcional)" rows="2"></textarea>
+    <button id="checkout-btn" class="btn btn-block" type="submit">Enviar pedido</button>
+    <p id="checkout-status" class="status" role="status"></p>
+  </form>
+</aside>
+
+<script>
+  import {
+    cart,
+    addItem,
+    decrementItem,
+    removeItem,
+    clearCart,
+    getItems,
+    getCount,
+    getTotal,
+  } from '../lib/cart';
+  import { submitOrder } from '../lib/api';
+
+  const $ = <T extends Element>(sel: string) => document.querySelector<T>(sel)!;
+
+  const toggle = $<HTMLButtonElement>('#cart-toggle');
+  const closeBtn = $<HTMLButtonElement>('#cart-close');
+  const overlay = $<HTMLDivElement>('#cart-overlay');
+  const drawer = $<HTMLElement>('#cart-drawer');
+  const countEl = $<HTMLSpanElement>('#cart-count');
+  const itemsEl = $<HTMLDivElement>('#cart-items');
+  const emptyEl = $<HTMLParagraphElement>('#cart-empty');
+  const form = $<HTMLFormElement>('#checkout-form');
+  const totalEl = $<HTMLElement>('#cart-total');
+  const statusEl = $<HTMLParagraphElement>('#checkout-status');
+
+  function openDrawer() {
+    drawer.classList.add('open');
+    overlay.hidden = false;
+    drawer.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeDrawer() {
+    drawer.classList.remove('open');
+    overlay.hidden = true;
+    drawer.setAttribute('aria-hidden', 'true');
+  }
+
+  toggle.addEventListener('click', openDrawer);
+  closeBtn.addEventListener('click', closeDrawer);
+  overlay.addEventListener('click', closeDrawer);
+
+  // Botones "Agregar" de las tarjetas (delegación de eventos).
+  document.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.add-btn');
+    if (!btn) return;
+    addItem({
+      id: btn.dataset.id!,
+      name: btn.dataset.name!,
+      price: Number(btn.dataset.price),
+    });
+  });
+
+  // Acciones dentro del drawer (+ / - / eliminar).
+  itemsEl.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-action]');
+    if (!btn) return;
+    const id = btn.dataset.id!;
+    const action = btn.dataset.action!;
+    if (action === 'inc') {
+      const item = getItems().find((i) => i.id === id)!;
+      addItem(item);
+    } else if (action === 'dec') {
+      decrementItem(id);
+    } else if (action === 'remove') {
+      removeItem(id);
+    }
+  });
+
+  function render() {
+    const items = getItems();
+    const count = getCount();
+
+    countEl.textContent = String(count);
+    countEl.hidden = count === 0;
+
+    emptyEl.hidden = count > 0;
+    form.hidden = count === 0;
+
+    itemsEl.innerHTML = items
+      .map(
+        (i) => `
+        <div class="cart-line">
+          <div class="cart-line__info">
+            <span class="cart-line__name">${i.name}</span>
+            <span class="cart-line__price">$${i.price.toFixed(2)} · ${i.qty} u.</span>
+          </div>
+          <div class="cart-line__qty">
+            <button type="button" class="cart-line__btn" data-action="dec" data-id="${i.id}" aria-label="Quitar uno">−</button>
+            <span class="cart-line__qty-count">${i.qty}</span>
+            <button type="button" class="cart-line__btn" data-action="inc" data-id="${i.id}" aria-label="Agregar uno">+</button>
+            <button type="button" class="cart-line__btn cart-line__btn--remove" data-action="remove" data-id="${i.id}" aria-label="Eliminar">🗑</button>
+          </div>
+        </div>`,
+      )
+      .join('');
+
+    totalEl.textContent = `$${getTotal().toFixed(2)}`;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const checkoutBtn = $<HTMLButtonElement>('#checkout-btn');
+    checkoutBtn.disabled = true;
+    statusEl.textContent = 'Enviando...';
+
+    try {
+      await submitOrder({
+        items: getItems(),
+        total: getTotal(),
+        customer: {
+          name: $<HTMLInputElement>('#cust-name').value,
+          email: $<HTMLInputElement>('#cust-email').value,
+          notes: $<HTMLTextAreaElement>('#cust-notes').value,
+        },
+      });
+      clearCart();
+      form.reset();
+      statusEl.textContent = '¡Pedido enviado! Gracias.';
+      setTimeout(closeDrawer, 1500);
+    } catch (err) {
+      statusEl.textContent = 'Hubo un error. Intenta de nuevo.';
+      console.error(err);
+    } finally {
+      checkoutBtn.disabled = false;
+    }
+  });
+
+  // Re-render reactivo ante cualquier cambio del store.
+  cart.listen(render);
+  render();
+</script>
+
+<style>
+  .cart-toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    padding: 0.5rem 0.95rem;
+    border-radius: var(--radius-full);
+    background: var(--text);
+    color: #fff;
+    transition:
+      transform 0.12s ease,
+      opacity 0.15s ease;
+  }
+
+  .cart-toggle:hover {
+    transform: translateY(-1px);
+    opacity: 0.92;
+  }
+
+  @media (max-width: 380px) {
+    .cart-toggle-label {
+      display: none;
+    }
+  }
+
+  .cart-count {
+    background: var(--primary);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 700;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(21, 17, 13, 0.45);
+    backdrop-filter: blur(2px);
+    z-index: 20;
+    animation: fade 0.2s ease;
+  }
+
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: min(400px, 92vw);
+    background: var(--surface);
+    z-index: 30;
+    transform: translateX(100%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .drawer.open {
+    transform: translateX(0);
+  }
+
+  .drawer-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-5);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .drawer-head h2 {
+    font-size: 1.25rem;
+  }
+
+  .icon-btn {
+    font-size: 0.95rem;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    transition:
+      background 0.15s ease,
+      color 0.15s ease;
+  }
+
+  .icon-btn:hover {
+    background: var(--surface-alt);
+    color: var(--text);
+  }
+
+  .icon-btn.remove:hover {
+    color: var(--primary-dark);
+    background: var(--primary-soft);
+  }
+
+  .drawer-body {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: var(--space-3) var(--space-5);
+  }
+
+  .cart-list {
+    display: block;
+  }
+
+  .cart-empty-msg {
+    color: var(--muted);
+    text-align: center;
+    padding: var(--space-6) 0;
+    font-size: 0.95rem;
+  }
+
+  .checkout {
+    padding: var(--space-5);
+    border-top: 1px solid var(--border);
+    background: var(--surface-alt);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 1rem;
+    color: var(--muted);
+    margin-bottom: var(--space-1);
+  }
+
+  .total-row strong {
+    font-size: 1.4rem;
+    color: var(--text);
+    letter-spacing: -0.02em;
+  }
+
+  .checkout input,
+  .checkout textarea {
+    width: 100%;
+    padding: 0.7rem 0.85rem;
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    resize: vertical;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  .checkout input::placeholder,
+  .checkout textarea::placeholder {
+    color: var(--muted-soft);
+  }
+
+  .checkout input:focus,
+  .checkout textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-soft);
+  }
+
+  .status {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--muted);
+    min-height: 1.1rem;
+  }
+</style>

@@ -1,0 +1,162 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProductGrid from '../components/ProductGrid.astro';
+import Cart from '../components/Cart.astro';
+import { getProducts } from '../lib/api';
+
+// Productos obtenidos en build time desde Apps Script (o datos de ejemplo).
+const products = await getProducts();
+---
+
+<BaseLayout title="Sabor & Co. — Menú">
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="/" class="logo">🍔 Sabor &amp; Co.</a>
+      <Cart />
+    </div>
+  </header>
+
+  <main class="container main">
+    <section class="hero">
+      <span class="hero-eyebrow">Abierto ahora</span>
+      <h1>Antojos que llegan en minutos</h1>
+      <p>Comida fresca, lista para pedir. Arma tu pedido y envíalo en segundos.</p>
+      <div class="hero-pills">
+        <span class="pill">⏱️ 25–35 min</span>
+        <span class="pill">🛵 Envío gratis +$15</span>
+        <span class="pill">⭐ 4.9 (320+)</span>
+      </div>
+    </section>
+
+    <div class="menu-head">
+      <h2>Menú</h2>
+      <span class="menu-count">{products.length} platillos</span>
+    </div>
+
+    <ProductGrid products={products} />
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>© {new Date().getFullYear()} Sabor &amp; Co. — Take-home demo.</p>
+    </div>
+  </footer>
+</BaseLayout>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 66px;
+  }
+
+  .logo {
+    font-weight: 800;
+    font-size: 1.3rem;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .main {
+    padding: var(--space-6) var(--space-5) var(--space-7);
+  }
+
+  .hero {
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #fff3ee 0%, #fef9f0 60%, #fff 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: clamp(1.5rem, 4vw, 2.75rem);
+    margin-bottom: var(--space-6);
+  }
+
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+    background: var(--primary-soft);
+    padding: 0.3rem 0.7rem;
+    border-radius: var(--radius-full);
+    margin-bottom: var(--space-4);
+  }
+
+  .hero-eyebrow::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #2bbf6a;
+    box-shadow: 0 0 0 3px rgba(43, 191, 106, 0.2);
+  }
+
+  .hero h1 {
+    font-size: clamp(1.8rem, 5vw, 3rem);
+    font-weight: 800;
+    max-width: 16ch;
+  }
+
+  .hero p {
+    color: var(--muted);
+    margin-top: var(--space-3);
+    font-size: 1.02rem;
+    max-width: 46ch;
+  }
+
+  .hero-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+  }
+
+  .pill {
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 0.4rem 0.8rem;
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .menu-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: var(--space-5);
+  }
+
+  .menu-head h2 {
+    font-size: 1.5rem;
+  }
+
+  .menu-count {
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+
+  .site-footer {
+    border-top: 1px solid var(--border);
+    padding: var(--space-5) 0;
+    color: var(--muted);
+    font-size: 0.85rem;
+    text-align: center;
+  }
+</style>
