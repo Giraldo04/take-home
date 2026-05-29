@@ -7,12 +7,13 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "start": "astro preview",
+    "start": "sirv dist --host 0.0.0.0 --port ${PORT:-4321} --single",
     "astro": "astro"
   },
   "dependencies": {
+    "@nanostores/persistent": "^0.10.2",
     "astro": "^4.16.0",
     "nanostores": "^0.11.3",
-    "@nanostores/persistent": "^0.10.2"
+    "sirv-cli": "^3.0.1"
   }
 }
