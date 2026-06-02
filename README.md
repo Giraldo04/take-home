@@ -46,7 +46,7 @@ Sin configuración funciona con **datos de ejemplo** (`src/lib/sample-products.t
 4. Crea `.env` a partir de `.env.example` y pega la URL:
 
    ```
-   PUBLIC_APPS_SCRIPT_URL=https://script.google.com/macros/s/AKfycby-0eDmw9rdSvbsCXNnUCOagExCmcW0RPr0DQChkyHu77W3Y8LPjY7o8D8ANG8xV9_yyA/exec
+   PUBLIC_APPS_SCRIPT_URL=https://tu_public_app_script.exec
    ```
 
 5. `npm run build && npm run preview`.
